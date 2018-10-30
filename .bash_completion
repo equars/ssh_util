@@ -1,0 +1,64 @@
+#!/bin/bash
+
+_sscp_comp(){
+    #Get data from command line
+    ncur=${COMP_CWORD} #cursor word num
+    cur=${COMP_WORDS[${COMP_CWORD}]} #cursor word
+
+    #sbtr hostname and dirname
+    if [ `echo $cur | grep ':'` ] ; then
+        declare -a splited=();
+        splited=( `echo $cur | tr -s ':' ' '`)
+        hostname=${splited[0]}
+        dirname=${splited[1]}      
+    else
+        hostname=""
+        dirname=$cur
+    fi
+
+    #find and compete
+    if [ -n "${hostname}" ];then
+        findcmd="compgen -f "${dirname}"" #cmd used in ssh host
+        res=$(ssh $hostname "$findcmd") #ssh and fetch completion word
+
+        #Proccess for when there are some candidate users have to determine.
+        res_spl=($res)
+        if [ -n "${res_spl[1]}" ] ; then
+            findcmd="ls "${dirname}"" #cmd used in ssh host
+            res=$(ssh $hostname "$findcmd") #ssh and fetch completion icandidate word
+        else
+            res=${res}
+        fi
+
+        COMPREPLY=(${res})
+    else
+        COMPREPLY=($(compgen -f -- "${dirname}"))
+    fi
+}
+complete -F _sscp_comp sscp
+
+_sls_comp(){
+    #Get data from command line
+    ncur=${COMP_CWORD} #cursor word num
+    cur=${COMP_WORDS[${COMP_CWORD}]} #cursor word
+    prev=${COMP_WORDS[${COMP_CWORD}-1]} #previous cursor word.
+
+    #sbtr hostname and dirname
+    if [ -n "$prev" -o $ncur -ge 3 ] ; then
+        hostname=$prev
+        dirname=$cur      
+    else
+        hostname=""
+        dirname=$cur
+    fi
+
+    #find and compete
+    if [ -n "${hostname}" ];then
+        findcmd="compgen -f -- "${dirname}"" #cmd used in ssh host
+        res=$(ssh $hostname "$findcmd") #ssh and fetch completion word
+        COMPREPLY=(${res} )
+    else
+        COMPREPLY=( $(compgen -f -- "${dirname}") )
+    fi
+}
+complete -F _sls_comp sls
