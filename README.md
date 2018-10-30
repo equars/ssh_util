@@ -9,7 +9,7 @@ Auto completion as usual on your local.
   #====This lines about ssh util====
   alias sscp="scp"
   alias sls="ls"
-  source ~/.bash\_completion
+  source ~/.bash_completion
   #=================================
   ```
 
