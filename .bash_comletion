@@ -1,0 +1,28 @@
+#!/bin/bash
+
+_sscp_comp(){
+    #Get data from command line
+    ncur=${COMP_CWORD} #cursor word num
+    cur=${COMP_WORDS[${COMP_CWORD}]} #cursor word
+
+    #sbtr hostname and dirname
+    if [ `echo $cur | grep ':'` ] ; then
+        declare -a splited=();
+        splited=( `echo $cur | tr -s ':' ' '`)
+        hostname=${splited[0]}
+        dirname=${splited[1]}      
+    else
+        hostname=""
+        dirname=$cur
+    fi
+
+    #find and compete
+    if [ -n "${hostname}" ];then
+        findcmd="compgen -f -- "${dirname}"" #cmd used in ssh host
+        res=$(ssh $hostname "$findcmd") #ssh and fetch completion word
+        COMPREPLY=(${res} )
+    else
+        COMPREPLY=( $(compgen -f -- "${dirname}") )
+    fi
+}
+complete -F _sscp_comp sscp sls
