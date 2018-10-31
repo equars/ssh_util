@@ -60,9 +60,37 @@ _sscp_comp(){
         COMPREPLY=(${res})
     else
         res=`compgen -f -- "${dirname}"`
-        res_spl=($res)
+
+        #Proccess for when there are more than 1 candidate users have to determine.
+        res_spl=(${res})
         if [ -n "${res_spl[1]}" ] ; then
-            res=`ls "${dirname}"` #cmd used in ssh host
+            for elem in ${res_spl[@]} ; do
+                elem_spl=( `echo ${elem} | tr -s '/' ' '`)
+                last=${elem_spl[${#elem_spl[@]}-1]}
+                res_tmp="${res_tmp} ${last}"
+                res_tmp_m=(${res_tmp}) #get matrix type
+            done
+            #test duplications in words
+            for ((i=0; i < ${#res_spl[@]-1}; i++)); do
+                for ((j=$i+1; j < ${#res_spl[@]}; j++)); do
+                    if [ ${res_tmp_m[$i]:0:1} = ${res_tmp_m[$j]:0:1} ]; then
+                        bf=1;
+                    fi
+                done
+            done
+            #test user input not include "/" for last char.
+            if [ "${cur:$((${#cur}-1))}" = "/" ] ; then
+                bf=0
+            fi
+            #test result words not include "/" for last char.
+            for ((i=0; i < ${#res_spl[@]}; i++)); do
+                if [ "${res_spl[$i]:$((${#res_spl[$i]}-1))}" != "/" ] ; then #test last chars of each elements are equal to "/"
+                    bf=1
+                fi
+            done
+            if [ $bf -eq 0 ]; then
+                res=$res_tmp
+            fi
         fi
         COMPREPLY=(${res})
     fi
