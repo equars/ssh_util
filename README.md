@@ -1,7 +1,14 @@
 # インストールと使用法  
 自分のローカルにいながらssh接続先のディレクトリやファイルをタブ補完できる，scpやlsの強化版です．
-.bash\_completionファイルを自分のホームディレクトリに置き，.bashrcを下の英語版の説明のようにします．
+.bash\_completionファイルを自分のホームディレクトリに置き，.bashrcを下のようにします．
 ターミナルを再起動するか，bashrcを読み込んで使用します．
+  ``` 
+  #====This lines for ssh util======
+  alias sscp="scp"
+  alias sls="ls"
+  source ~/.bash_completion
+  #=================================
+  ```
 できる限りsshは公開鍵認証に，ssh接続情報はconfigに設定しておくと便利です．
 sscpならscp，slsならlsと使用方法や機能は同じです（エイリアス設定をみれば当然ですね．）
 scpなら`$scp hoge:~/foo/bar.txt ~/dir1/`のように使用すると思いますが，sscpならばhoge:に続くリモート側のディレクトリにもTabキーによる補完が可能です．
@@ -21,7 +28,7 @@ Auto completion as usual on your local.
 
 2.Then,add lines below with ".bashrc".
   ``` 
-  #====This lines about ssh util====
+  #====This lines for ssh util======
   alias sscp="scp"
   alias sls="ls"
   source ~/.bash_completion
