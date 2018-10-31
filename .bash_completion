@@ -5,6 +5,11 @@ _sscp_comp(){
     ncur=${COMP_CWORD} #cursor word num
     cur=${COMP_WORDS[${COMP_CWORD}]} #cursor word
 
+    #Initialize
+    bf=0
+    res_tmp=""
+    COMPREPLY=""
+
     #sbtr hostname and dirname
     if [ `echo $cur | grep ':'` ] ; then
         declare -a splited=();
@@ -21,18 +26,45 @@ _sscp_comp(){
         findcmd="compgen -f "${dirname}"" #cmd used in ssh host
         res=$(ssh $hostname "$findcmd") #ssh and fetch completion word
 
-        #Proccess for when there are some candidate users have to determine.
-        res_spl=($res)
+        #Proccess for when there are more than 1 candidate users have to determine.
+        res_spl=(${res})
         if [ -n "${res_spl[1]}" ] ; then
-            findcmd="ls "${dirname}"" #cmd used in ssh host
-            res=$(ssh $hostname "$findcmd") #ssh and fetch completion icandidate word
-        else
-            res=${res}
+            for elem in ${res_spl[@]} ; do
+                elem_spl=( `echo ${elem} | tr -s '/' ' '`)
+                last=${elem_spl[${#elem_spl[@]}-1]}
+                res_tmp="${res_tmp} ${last}"
+                res_tmp_m=(${res_tmp}) #get matrix type
+            done
+            #test duplications in words
+            for ((i=0; i < ${#res_spl[@]-1}; i++)); do
+                for ((j=$i+1; j < ${#res_spl[@]}; j++)); do
+                    if [ ${res_tmp_m[$i]:0:1} = ${res_tmp_m[$j]:0:1} ]; then
+                        bf=1;
+                    fi
+                done
+            done
+            #test user input not include "/" for last char.
+            if [ "${cur:$((${#cur}-1))}" = "/" ] ; then
+                bf=0
+            fi
+            #test result words not include "/" for last char.
+            for ((i=0; i < ${#res_spl[@]}; i++)); do
+                if [ "${res_spl[$i]:$((${#res_spl[$i]}-1))}" != "/" ] ; then #test last chars of each elements are equal to "/"
+                    bf=1
+                fi
+            done
+            if [ $bf -eq 0 ]; then
+                res=$res_tmp
+            fi
         fi
-
         COMPREPLY=(${res})
     else
-        COMPREPLY=($(compgen -f -- "${dirname}"))
+        res=`compgen -f -- "${dirname}"`
+        res_spl=($res)
+        if [ -n "${res_spl[1]}" ] ; then
+            res=`ls "${dirname}"` #cmd used in ssh host
+        fi
+        COMPREPLY=(${res})
     fi
 }
 complete -F _sscp_comp sscp
