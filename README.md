@@ -13,7 +13,7 @@ scpなら`$scp hoge:~/foo/bar.txt ~/dir1/`のように使用すると思いま�
 slsは現在使えないものと考えてください．
 
 # English  
-Commands "scp" and "ls" with the function of completion directory name.
+Commands "sscp" and "sls" are as "scp" and "ls" with the function of completion remote server directory name.
 Auto completion as usual on your local.
 
 ## How to install.  
@@ -65,5 +65,5 @@ Demo are shown below:
   Automatically seek server directory even if you are on local.
 
 ## Caution.  
-Temporally disavailabe "sls" command.
+Temporally, "sls" command is disable.
 
