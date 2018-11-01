@@ -39,23 +39,15 @@ _sscp_comp(){
             res_tmp_m=(${res_tmp}) #get matrix type
         done
         #test duplications in words
-        for ((i=0; i < ${#res_spl[@]-1}; i++)); do
-            for ((j=$i+1; j < ${#res_spl[@]}; j++)); do
-                if [ ${res_tmp_m[$i]:0:1} = ${res_tmp_m[$j]:0:1} ]; then
-                    bf=1;
-                fi
-            done
-        done
-        #test user input not include "/" for last char.
-        if [ "${cur:$((${#cur}-1))}" = "/" ] ; then
-            bf=0
-        fi
-        #test result words not include "/" for last char.
-        for ((i=0; i < ${#res_spl[@]}; i++)); do
-            if [ "${res_spl[$i]:$((${#res_spl[$i]}-1))}" != "/" ] ; then #test last chars of each elements are equal to "/"
-                bf=1
+        w1=${res_tmp_m[0]}
+        bf=1
+        for ((i=1; i < ${#res_spl[@]}; i++)); do
+            w2=${res_tmp_m[i]}
+            if [ ${w1:0:1} != ${w2:0:1} ]; then
+                bf=0
             fi
         done
+
         if [ $bf -eq 0 ]; then
             res=$res_tmp
         fi
